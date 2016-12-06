@@ -3,43 +3,46 @@ package gofixtures
 import (
 	"testing"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
-
 	"github.com/jinzhu/gorm"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 )
 
 func TestFactoryData(t *testing.T) {
-	db, err := gorm.Open("sqlite3", "/tmp/gofixtures.db")
+	db, err := gorm.Open("mysql", "root@/gofixtures?charset=utf8&parseTime=True&loc=Local")
+	db.LogMode(true)
+	if err != nil {
+		panic(err)
+	}
 	defer db.Close()
 
-    var common = Data(
+	var common = Data(
 		[]Gender{
-			{ID: 1, Slug: "men", Name: "Men"},
+			{Slug: "men", Name: "Men"},
 			{Slug: "women", Name: "Women"},
 		},
 		[]Category{
 			{Slug: "shirts", Name: "Shirts", FullName: "T-Shirts"},
 		},
-    )
+	)
 
-    var queryUpdates = Updates(
-        Product{Code: "AA*"}, 
-        FieldToQuery("Gender", Gender{Slug: "men"})
-            .FieldToQuery("Categories", Category{Slug: "shirts"})
-            .FieldToValue("Season", "SW2016")
-            .FieldsToRandomData("Description", "MaterialDescription")
-    )
+	var queryUpdates = Updates(
+		Product{Code: "AA*"},
+		FieldToQuery("Gender", Gender{Slug: "men"}).
+			FieldToQuery("Categories", Category{Slug: "shirts"}).
+			FieldToValue("Season", "SW2016").
+			FieldsToRandomData("Description", "MaterialDescription"),
+	)
 
 	var d = Data(
-        common,
+		common,
 		[]Product{
 			{Code: "AAA", Name: "Product 1", EnglishName: "Product English Name 1", GenderID: 1},
 		},
-        queryUpdates,
+		queryUpdates,
 	)
 
-    d.Put(db)
-    d.TruncatePut(db)
+	// d.Put(db)
+	d.Put(db, true)
 }
 
 type Product struct {
