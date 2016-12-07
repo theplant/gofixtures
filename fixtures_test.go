@@ -1,85 +1,48 @@
-package gofixtures
+package gofixtures_test
 
 import (
-	"testing"
-
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/theplant/gofixtures"
 )
 
-func TestFactoryData(t *testing.T) {
-	db, err := gorm.Open("mysql", "root@/gofixtures?charset=utf8&parseTime=True&loc=Local")
-	db.LogMode(true)
-	if err != nil {
-		panic(err)
-	}
-	defer db.Close()
+// Use Data method to setup fixtures data
+func ExampleData_1setup() {
+	db := connectDB()
 
-	var common = Data(
+	var applicationBootData = gofixtures.Data(
 		[]Gender{
-			{Slug: "men", Name: "Men"},
-			{Slug: "women", Name: "Women"},
+			{Model: gorm.Model{ID: 100}, Slug: "men", Name: "Men"},
+			{Model: gorm.Model{ID: 200}, Slug: "women", Name: "Women"},
 		},
 		[]Category{
 			{Slug: "shirts", Name: "Shirts", FullName: "T-Shirts"},
 		},
 	)
 
-	var queryUpdates = Updates(
-		Product{Code: "AA*"},
-		FieldToQuery("Gender", Gender{Slug: "men"}).
-			FieldToQuery("Categories", Category{Slug: "shirts"}).
-			FieldToValue("Season", "SW2016").
-			FieldsToRandomData("Description", "MaterialDescription"),
-	)
-
-	var d = Data(
-		common,
+	var dataForShowProduct = gofixtures.Data(
+		applicationBootData,
+		[]Gender{
+			{Slug: "kids", Name: "Kids"},
+		},
 		[]Product{
 			{Code: "AAA", Name: "Product 1", EnglishName: "Product English Name 1", GenderID: 1},
 		},
-		queryUpdates,
 	)
 
-	// d.Put(db)
-	d.Put(db, true)
-}
+	var dataForSearchProduct = gofixtures.Data(
+		applicationBootData,
+		[]Product{
+			{Code: "CCC", Name: "Product C", EnglishName: "Product English Name C", GenderID: 100},
+			{Code: "DDD", Name: "Product C", EnglishName: "Product English Name C", GenderID: 100},
+		},
+	)
 
-type Product struct {
-	gorm.Model
+	// Before you test show product
+	dataForShowProduct.TruncatePut(db)
 
-	Code string `gorm:"size:128"`
-
-	Gender   Gender
-	GenderID uint
-
-	Name                string `gorm:"size:255"`
-	EnglishName         string `gorm:"size:255"`
-	Season              string `gorm:"size:20"`
-	Description         string `gorm:"type:text"`
-	MaterialDescription string `gorm:"type:text"`
-	MadeCountry         string `gorm:"size:40"`
-
-	Categories []Category `gorm:"many2many:product_categories;"`
-
-	Weight string
-}
-
-type Gender struct {
-	gorm.Model
-
-	Slug string `gorm:"size:10"`
-	Name string `gorm:"size:255"`
-}
-
-type Category struct {
-	gorm.Model
-
-	Code     string `gorm:"size:20"`
-	Name     string `gorm:"size:255"`
-	FullName string `gorm:"size:255"`
-	Slug     string `gorm:"size:50"`
-
-	CategoryID    uint
-	SubCategories []Category
+	// Before you test search product, the database will only contains applicationBootData, and dataForSearchProduct
+	// The data inside dataForShowProduct won't exists.
+	dataForSearchProduct.TruncatePut(db)
+	//Output:
 }

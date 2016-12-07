@@ -1,29 +1,30 @@
+/*
+
+gofixtures is a package for creating fixture data for tests. It has to be used with https://github.com/jinzhu/gorm.
+You can simply setup a group of tables data by using Go syntax, and reuse those data in other test cases with it's simple dependency management.
+
+*/
 package gofixtures
 
 import (
+	"fmt"
 	"reflect"
 
 	"github.com/jinzhu/gorm"
 )
 
-type Context interface {
-	Put(db *gorm.DB, truncate bool)
-}
-
-type FieldWithQuery interface {
-	FieldToQuery(fieldName string, query interface{}) FieldWithQuery
-	FieldToValue(fieldName string, value interface{}) FieldWithQuery
-	FieldsToRandomData(fieldNames ...string) FieldWithQuery
-}
-
 type dataContext struct {
 	lists []interface{}
 }
 
-func (mc *dataContext) Put(db *gorm.DB, truncate bool) {
+func (mc *dataContext) TruncatePut(db *gorm.DB) {
+	truncatePutOnlyFirstTime(db, mc, make(map[string]bool))
+}
+
+func truncatePutOnlyFirstTime(db *gorm.DB, mc *dataContext, truncatedTables map[string]bool) {
 	for _, l := range mc.lists {
-		if c, ok := l.(Context); ok {
-			c.Put(db, truncate)
+		if c, ok := l.(*dataContext); ok {
+			truncatePutOnlyFirstTime(db, c, truncatedTables)
 			continue
 		}
 
@@ -37,17 +38,21 @@ func (mc *dataContext) Put(db *gorm.DB, truncate bool) {
 				obj := val.Interface()
 				// log.Printf("obj: %#+v\n", obj)
 				if i == 0 {
-					if truncate {
-						err := db.DropTableIfExists(obj).Error
+					emptyObj := reflect.New(val.Type()).Interface()
+					tableName := db.NewScope(emptyObj).TableName()
+					if !truncatedTables[tableName] {
+						err := db.AutoMigrate(emptyObj).Error
 						if err != nil {
 							panic(err)
 						}
-					}
-					err := db.AutoMigrate(obj).Error
-					if err != nil {
-						panic(err)
+						err = db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", tableName)).Error
+						if err != nil {
+							panic(err)
+						}
+						truncatedTables[tableName] = true
 					}
 				}
+
 				err := db.Save(obj).Error
 				if err != nil {
 					panic(err)
@@ -58,58 +63,7 @@ func (mc *dataContext) Put(db *gorm.DB, truncate bool) {
 	return
 }
 
-func Data(lists ...interface{}) (c Context) {
+func Data(lists ...interface{}) (c *dataContext) {
 	c = &dataContext{lists: lists}
-	return
-}
-
-type updatesContext struct {
-	sourceQuery  interface{}
-	updatesQuery FieldWithQuery
-}
-
-func Updates(sourceQuery interface{}, updatesQuery FieldWithQuery) (c Context) {
-	c = &updatesContext{sourceQuery: sourceQuery, updatesQuery: updatesQuery}
-	return
-}
-
-func (uc *updatesContext) Put(db *gorm.DB, truncate bool) {
-	// db.Where(uc.sourceQuery).UpdateColumns()
-	return
-}
-
-type listedFieldToQuery struct {
-	field2Values     []field2Value
-	field2Queries    []field2Query
-	randomDataFields []string
-}
-
-type field2Value struct {
-	fieldName string
-	value     interface{}
-}
-
-type field2Query struct {
-	fieldName string
-	query     interface{}
-}
-
-func (lfq *listedFieldToQuery) FieldToQuery(fieldName string, query interface{}) FieldWithQuery {
-	lfq.field2Queries = append(lfq.field2Queries, field2Query{fieldName, query})
-	return lfq
-}
-
-func (lfq *listedFieldToQuery) FieldToValue(fieldName string, value interface{}) FieldWithQuery {
-	lfq.field2Values = append(lfq.field2Values, field2Value{fieldName, value})
-	return lfq
-}
-
-func (lfq *listedFieldToQuery) FieldsToRandomData(fieldNames ...string) FieldWithQuery {
-	lfq.randomDataFields = append(lfq.randomDataFields, fieldNames...)
-	return lfq
-}
-
-func FieldToQuery(fieldName string, query interface{}) (fwq FieldWithQuery) {
-	fwq = &listedFieldToQuery{}
 	return
 }
