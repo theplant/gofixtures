@@ -39,17 +39,17 @@ func truncatePutOnlyFirstTime(db *gorm.DB, mc *dataContext, truncatedTables map[
 				// log.Printf("obj: %#+v\n", obj)
 				if i == 0 {
 					emptyObj := reflect.New(val.Type()).Interface()
-					tableName := db.NewScope(emptyObj).TableName()
-					if !truncatedTables[tableName] {
+					quotedTableName := db.NewScope(emptyObj).QuotedTableName()
+					if !truncatedTables[quotedTableName] {
 						err := db.AutoMigrate(emptyObj).Error
 						if err != nil {
 							panic(err)
 						}
-						err = db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", tableName)).Error
+						err = db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", quotedTableName)).Error
 						if err != nil {
 							panic(err)
 						}
-						truncatedTables[tableName] = true
+						truncatedTables[quotedTableName] = true
 					}
 				}
 
