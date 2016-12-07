@@ -16,7 +16,7 @@ func ExampleData_1setup() {
 			{Model: gorm.Model{ID: 200}, Slug: "women", Name: "Women"},
 		},
 		[]Category{
-			{Slug: "shirts", Name: "Shirts", FullName: "T-Shirts"},
+			{Slug: "shirts", Code: "t-shirts", Name: "Shirts", FullName: "T-Shirts"},
 		},
 	)
 
@@ -26,7 +26,7 @@ func ExampleData_1setup() {
 			{Slug: "kids", Name: "Kids"},
 		},
 		[]Product{
-			{Code: "AAA", Name: "Product 1", EnglishName: "Product English Name 1", GenderID: 1},
+			{Code: "AAA", Name: "Product A", EnglishName: "Product English Name A", GenderID: 1},
 		},
 	)
 
@@ -34,7 +34,7 @@ func ExampleData_1setup() {
 		applicationBootData,
 		[]Product{
 			{Code: "CCC", Name: "Product C", EnglishName: "Product English Name C", GenderID: 100},
-			{Code: "DDD", Name: "Product C", EnglishName: "Product English Name C", GenderID: 100},
+			{Code: "DDD", Name: "Product D", EnglishName: "Product English Name D", GenderID: 100},
 		},
 	)
 

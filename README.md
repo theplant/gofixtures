@@ -26,7 +26,7 @@ Use Data method to setup fixtures data
 	        {Model: gorm.Model{ID: 200}, Slug: "women", Name: "Women"},
 	    },
 	    []Category{
-	        {Slug: "shirts", Name: "Shirts", FullName: "T-Shirts"},
+	        {Slug: "shirts", Code: "t-shirts", Name: "Shirts", FullName: "T-Shirts"},
 	    },
 	)
 	
@@ -36,7 +36,7 @@ Use Data method to setup fixtures data
 	        {Slug: "kids", Name: "Kids"},
 	    },
 	    []Product{
-	        {Code: "AAA", Name: "Product 1", EnglishName: "Product English Name 1", GenderID: 1},
+	        {Code: "AAA", Name: "Product A", EnglishName: "Product English Name A", GenderID: 1},
 	    },
 	)
 	
@@ -44,7 +44,7 @@ Use Data method to setup fixtures data
 	    applicationBootData,
 	    []Product{
 	        {Code: "CCC", Name: "Product C", EnglishName: "Product English Name C", GenderID: 100},
-	        {Code: "DDD", Name: "Product C", EnglishName: "Product English Name C", GenderID: 100},
+	        {Code: "DDD", Name: "Product D", EnglishName: "Product English Name D", GenderID: 100},
 	    },
 	)
 	
