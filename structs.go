@@ -18,13 +18,17 @@ type dataContext struct {
 }
 
 func (mc *dataContext) TruncatePut(db *gorm.DB) {
-	truncatePutOnlyFirstTime(db, mc, make(map[string]bool))
+	mc.truncatePutOnce(db, make(map[string]bool))
 }
 
-func truncatePutOnlyFirstTime(db *gorm.DB, mc *dataContext, truncatedTables map[string]bool) {
+type firstTimeTruncate interface {
+	truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool)
+}
+
+func (mc *dataContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool) {
 	for _, l := range mc.lists {
-		if c, ok := l.(*dataContext); ok {
-			truncatePutOnlyFirstTime(db, c, truncatedTables)
+		if c, ok := l.(firstTimeTruncate); ok {
+			c.truncatePutOnce(db, truncatedTables)
 			continue
 		}
 
@@ -39,8 +43,10 @@ func truncatePutOnlyFirstTime(db *gorm.DB, mc *dataContext, truncatedTables map[
 				// log.Printf("obj: %#+v\n", obj)
 				if i == 0 {
 					emptyObj := reflect.New(val.Type()).Interface()
-					quotedTableName := db.NewScope(emptyObj).QuotedTableName()
-					if !truncatedTables[quotedTableName] {
+					scope := db.NewScope(emptyObj)
+					tableName := scope.TableName()
+					quotedTableName := scope.QuotedTableName()
+					if !truncatedTables[tableName] {
 						err := db.AutoMigrate(emptyObj).Error
 						if err != nil {
 							panic(err)
@@ -49,7 +55,7 @@ func truncatePutOnlyFirstTime(db *gorm.DB, mc *dataContext, truncatedTables map[
 						if err != nil {
 							panic(err)
 						}
-						truncatedTables[quotedTableName] = true
+						truncatedTables[tableName] = true
 					}
 				}
 

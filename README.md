@@ -7,6 +7,7 @@ You can simply setup a group of tables data by using Go syntax, and reuse those 
 
 
 * [Data](#data)
+* [Inserts](#inserts)
 
 
 
@@ -54,6 +55,22 @@ Use Data method to setup fixtures data
 	// Before you test search product, the database will only contains applicationBootData, and dataForSearchProduct
 	// The data inside dataForShowProduct won't exists.
 	dataForSearchProduct.TruncatePut(db)
+	//Output:
+```
+
+## Inserts
+``` go
+func Inserts(sqls io.Reader) (c *insertsContext)
+```
+
+```go
+	db := connectDB()
+	
+	var d = gofixtures.Data(
+	    gofixtures.Inserts(strings.NewReader(data)),
+	)
+	
+	d.TruncatePut(db)
 	//Output:
 ```
 
