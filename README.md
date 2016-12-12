@@ -60,19 +60,9 @@ Use Data method to setup fixtures data
 
 ## Inserts
 ``` go
-func Inserts(sqls io.Reader) (c *insertsContext)
+func Inserts(sqls string) (c *insertsContext)
 ```
 
-```go
-	db := connectDB()
-	
-	var d = gofixtures.Data(
-	    gofixtures.Inserts(strings.NewReader(data)),
-	)
-	
-	d.TruncatePut(db)
-	//Output:
-```
 
 
 

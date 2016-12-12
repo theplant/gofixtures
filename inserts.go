@@ -1,10 +1,10 @@
 package gofixtures
 
 import (
-	"log"
+	"fmt"
 
 	"github.com/jinzhu/gorm"
-	"github.com/jmoiron/sqlx"
+	"github.com/xwb1989/sqlparser"
 )
 
 type insertsContext struct {
@@ -13,13 +13,7 @@ type insertsContext struct {
 
 func (ic *insertsContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool) {
 
-	dbx, err := sqlx.Connect("mysql", "root@/gofixtures?charset=utf8&parseTime=True&loc=Local")
-	if err != nil {
-		log.Fatalln(err)
-	}
-
-	dbx.MustExec(ic.insertSqls)
-	// err := db.Exec(ic.insertSqls).Error
+	err := db.Exec(ic.insertSqls).Error
 	if err != nil {
 		panic(err)
 	}
@@ -30,6 +24,11 @@ func tableNameFromInsert(sql string) (tableName string) {
 }
 
 func Inserts(sqls string) (c *insertsContext) {
+	stmt, err := sqlparser.Parse(sqls)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(stmt)
 	// insertSqls := []string{}
 
 	// buf := bufio.NewReader(sqls)
