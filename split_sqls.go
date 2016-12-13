@@ -1,16 +1,11 @@
-package internal
+package gofixtures
 
 import (
 	"bufio"
-	"fmt"
 	"io"
-
-	"strings"
-
-	"github.com/xwb1989/sqlparser"
 )
 
-func Sqls(r io.Reader) (stmts []sqlparser.Statement, err error) {
+func splitSqls(r io.Reader) (sqls []string) {
 	s := bufio.NewScanner(r)
 	s.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// fmt.Println("Split data: ", len(data))
@@ -65,27 +60,10 @@ func Sqls(r io.Reader) (stmts []sqlparser.Statement, err error) {
 	})
 	for s.Scan() {
 		sql := s.Text()
-		if strings.Index(strings.ToUpper(sql), "INSERT INTO") != 0 {
+		if len(sql) == 0 {
 			continue
 		}
-
-		fmt.Println("======!!!!!!")
-		fmt.Println(s.Text())
-		var stmt sqlparser.Statement
-		stmt, err = sqlparser.Parse(sql)
-		if err != nil {
-			return
-		}
-
-		insert := stmt.(*sqlparser.Insert)
-		fmt.Println("table_name: ", string(insert.Table.Name))
-		for _, c := range insert.Columns {
-
-			fmt.Println("column: ", c)
-		}
-
-		stmts = append(stmts, stmt)
+		sqls = append(sqls, sql)
 	}
 	return
-
 }

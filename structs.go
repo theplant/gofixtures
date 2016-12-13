@@ -25,6 +25,20 @@ type firstTimeTruncate interface {
 	truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool)
 }
 
+func truncateTablesIfNotYet(db *gorm.DB, tableNames []string, truncatedTables map[string]bool) {
+	for _, tableName := range tableNames {
+		if truncatedTables[tableName] {
+			continue
+		}
+
+		err := db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", db.NewScope(nil).Quote(tableName))).Error
+		if err != nil {
+			panic(err)
+		}
+		truncatedTables[tableName] = true
+	}
+}
+
 func (mc *dataContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool) {
 	for _, l := range mc.lists {
 		if c, ok := l.(firstTimeTruncate); ok {
@@ -45,17 +59,12 @@ func (mc *dataContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]b
 					emptyObj := reflect.New(val.Type()).Interface()
 					scope := db.NewScope(emptyObj)
 					tableName := scope.TableName()
-					quotedTableName := scope.QuotedTableName()
 					if !truncatedTables[tableName] {
 						err := db.AutoMigrate(emptyObj).Error
 						if err != nil {
 							panic(err)
 						}
-						err = db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", quotedTableName)).Error
-						if err != nil {
-							panic(err)
-						}
-						truncatedTables[tableName] = true
+						truncateTablesIfNotYet(db, []string{tableName}, truncatedTables)
 					}
 				}
 
