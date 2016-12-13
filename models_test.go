@@ -30,8 +30,8 @@ type Product struct {
 	MadeCountry         string `gorm:"size:40"`
 
 	Categories []Category `gorm:"many2many:product_categories;"`
-
-	Weight string
+	IconFlagID uint
+	Weight     string
 }
 
 type Gender struct {
