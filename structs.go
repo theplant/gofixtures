@@ -31,7 +31,7 @@ func truncateTablesIfNotYet(db *gorm.DB, tableNames []string, truncatedTables ma
 			continue
 		}
 
-		err := db.Exec(fmt.Sprintf("TRUNCATE TABLE %s", db.NewScope(nil).Quote(tableName))).Error
+		err := db.Exec(fmt.Sprintf("DELETE FROM %s", db.NewScope(nil).Quote(tableName))).Error
 		if err != nil {
 			panic(err)
 		}
