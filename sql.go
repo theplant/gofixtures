@@ -1,7 +1,10 @@
 package gofixtures
 
-import "github.com/jinzhu/gorm"
-import "strings"
+import (
+	"strings"
+
+	"github.com/jinzhu/gorm"
+)
 
 type sqlsContext struct {
 	sqls           []string
@@ -20,7 +23,7 @@ func (ic *sqlsContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]b
 
 func Sql(sqls string, truncateTables []string) (c *sqlsContext) {
 	c = &sqlsContext{
-		sqls:           splitSqls(strings.NewReader(sqls)),
+		sqls:           mergeInsertValues(splitSqls(strings.NewReader(sqls))),
 		truncateTables: truncateTables,
 	}
 	return

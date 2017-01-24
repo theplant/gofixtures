@@ -3,12 +3,12 @@ package gofixtures
 import (
 	"bufio"
 	"io"
+	"strings"
 )
 
 func splitSqls(r io.Reader) (sqls []string) {
 	s := bufio.NewScanner(r)
 	s.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
-		// fmt.Println("Split data: ", len(data))
 		inQuote := false
 		inLineComment := false
 		inBlockComment := false
@@ -54,12 +54,17 @@ func splitSqls(r io.Reader) (sqls []string) {
 				}
 			}
 
+			if atEOF && i+1 == len(data) {
+				token = data[:i]
+				advance = i + 1
+				return
+			}
 		}
 
 		return
 	})
 	for s.Scan() {
-		sql := s.Text()
+		sql := strings.TrimSpace(s.Text())
 		if len(sql) == 0 {
 			continue
 		}
