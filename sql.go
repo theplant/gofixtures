@@ -14,7 +14,7 @@ type sqlsContext struct {
 func (ic *sqlsContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool) {
 	truncateTablesIfNotYet(db, ic.truncateTables, truncatedTables)
 	for _, sql := range ic.sqls {
-		err := db.Exec(sql).Error
+		_, err := db.DB().Exec(sql)
 		if err != nil {
 			panic(err)
 		}
