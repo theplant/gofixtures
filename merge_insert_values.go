@@ -9,7 +9,10 @@ func mergeInsertValues(sqls []string) (outs []string) {
 	for _, sql := range sqls {
 		// log.Printf("sql: %#+v\n", sql)
 		upsql := strings.ToUpper(sql)
-		valuesIndex := strings.Index(upsql, "VALUES")
+		// table name contains VALUES
+		valuesIndex := strings.Index(upsql, " VALUES")
+		// ++ let valuesIndex point to V
+		valuesIndex++
 
 		if strings.Index(upsql, "INSERT INTO") >= 0 && valuesIndex > 0 {
 			key := strings.TrimSpace(sql[0 : valuesIndex+6])
