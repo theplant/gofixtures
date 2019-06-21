@@ -1,13 +1,12 @@
 package gofixtures
 
 import (
-	"bufio"
 	"io"
 	"strings"
 )
 
 func splitSqls(r io.Reader) (sqls []string) {
-	s := bufio.NewScanner(r)
+	s := NewScanner(r)
 	s.Split(func(data []byte, atEOF bool) (advance int, token []byte, err error) {
 		// fmt.Printf("data left = %q\n\n\n", data)
 		inQuote := false
@@ -46,7 +45,7 @@ func splitSqls(r io.Reader) (sqls []string) {
 			}
 
 			if inBlockComment {
-				if len(data) > i+4 && (string(data[i:i+4]) == "*/;\n" || string(data[i:i+4]) == "*/\n") {
+				if len(data) > i+3 && (string(data[i:i+4]) == "*/;\n" || string(data[i:i+4]) == "*/\n") {
 					inBlockComment = false
 					advance = i + 4
 					// fmt.Printf("skipping block comment: %q\n", data[:i+4])
@@ -82,6 +81,7 @@ func splitSqls(r io.Reader) (sqls []string) {
 
 		return
 	})
+
 	for s.Scan() {
 		sql := strings.TrimSpace(s.Text())
 		// fmt.Println("token!!!! =", string(sql))
@@ -90,5 +90,10 @@ func splitSqls(r io.Reader) (sqls []string) {
 		}
 		sqls = append(sqls, sql)
 	}
+
+	if s.Err() != nil {
+		panic(s.Err())
+	}
+
 	return
 }
