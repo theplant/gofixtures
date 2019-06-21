@@ -11,7 +11,7 @@ import (
 	"github.com/theplant/testingutils"
 )
 
-func TestSplitSqls(t *testing.T) {
+func TestSplitSqls(t1 *testing.T) {
 	p := filepath.Join(os.Getenv("GOPATH"), "src/github.com/theplant/gofixtures/fixtures", "/*.in.sql")
 	files, err := filepath.Glob(p)
 	if err != nil {
@@ -29,14 +29,16 @@ func TestSplitSqls(t *testing.T) {
 		}
 		buf := bytes.NewBuffer(nil)
 		io.Copy(buf, out)
-		stmts := splitSqls(in)
+		t1.Run(filepath.Base(f), func(t *testing.T) {
+			stmts := splitSqls(in)
 
-		actualOut := strings.Join(stmts, "\n\n")
+			actualOut := strings.Join(stmts, "\n\n")
 
-		diff := testingutils.PrettyJsonDiff(buf.String(), actualOut)
-		if len(diff) > 0 {
-			t.Error(f + "\n" + diff)
-		}
+			diff := testingutils.PrettyJsonDiff(buf.String(), actualOut)
+			if len(diff) > 0 {
+				t.Error(f + "\n" + diff)
+			}
+		})
 	}
 }
 

@@ -21,6 +21,12 @@ func splitSqls(r io.Reader) (sqls []string) {
 				}
 			}
 
+			if len(data) > i+1 {
+				if string(data[i:i+2]) == "\n#" || (i == 0 && string(data[i:i+1]) == "#") {
+					inLineComment = true
+				}
+			}
+
 			if inLineComment {
 				if len(data) > i+1 && data[i+1] == '\n' {
 					inLineComment = false
@@ -40,7 +46,7 @@ func splitSqls(r io.Reader) (sqls []string) {
 			}
 
 			if inBlockComment {
-				if string(data[i:i+4]) == "*/;\n" || string(data[i:i+4]) == "*/\n" {
+				if len(data) > i+4 && (string(data[i:i+4]) == "*/;\n" || string(data[i:i+4]) == "*/\n") {
 					inBlockComment = false
 					advance = i + 4
 					// fmt.Printf("skipping block comment: %q\n", data[:i+4])
