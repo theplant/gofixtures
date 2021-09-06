@@ -6,7 +6,7 @@ import (
 )
 
 func connectDB() *gorm.DB {
-	db, err := gorm.Open("mysql", "root@/gofixtures?charset=utf8&parseTime=True&loc=Local")
+	db, err := gorm.Open("mysql", "gofixtures:123@tcp(127.0.0.1:3406)/gofixtures_dev?charset=utf8&parseTime=True&loc=Local")
 	db.LogMode(true)
 	if err != nil {
 		panic(err)

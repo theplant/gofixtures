@@ -7,31 +7,29 @@ You can simply setup a group of tables data by using Go syntax, and reuse those 
 package gofixtures
 
 import (
+	"database/sql"
 	"fmt"
-	"reflect"
-
-	"github.com/jinzhu/gorm"
 )
 
 type dataContext struct {
 	lists []interface{}
 }
 
-func (mc *dataContext) TruncatePut(db *gorm.DB) {
+func (mc *dataContext) TruncatePut(db *sql.DB) {
 	mc.truncatePutOnce(db, make(map[string]bool))
 }
 
 type firstTimeTruncate interface {
-	truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool)
+	truncatePutOnce(db *sql.DB, truncatedTables map[string]bool)
 }
 
-func truncateTablesIfNotYet(db *gorm.DB, tableNames []string, truncatedTables map[string]bool) {
+func truncateTablesIfNotYet(db *sql.DB, tableNames []string, truncatedTables map[string]bool) {
 	for _, tableName := range tableNames {
 		if truncatedTables[tableName] {
 			continue
 		}
 
-		err := db.Exec(fmt.Sprintf("DELETE FROM %s", db.NewScope(nil).Quote(tableName))).Error
+		_, err := db.Exec(fmt.Sprintf("DELETE FROM %s", tableName))
 		if err != nil {
 			panic(err)
 		}
@@ -39,40 +37,11 @@ func truncateTablesIfNotYet(db *gorm.DB, tableNames []string, truncatedTables ma
 	}
 }
 
-func (mc *dataContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool) {
+func (mc *dataContext) truncatePutOnce(db *sql.DB, truncatedTables map[string]bool) {
 	for _, l := range mc.lists {
 		if c, ok := l.(firstTimeTruncate); ok {
 			c.truncatePutOnce(db, truncatedTables)
 			continue
-		}
-
-		v := reflect.ValueOf(l)
-		if v.Kind() == reflect.Slice {
-			for i := 0; i < v.Len(); i++ {
-				val := v.Index(i)
-				if val.Kind() != reflect.Ptr {
-					val = val.Addr()
-				}
-				obj := val.Interface()
-				// log.Printf("obj: %#+v\n", obj)
-				if i == 0 {
-					emptyObj := reflect.New(val.Type()).Interface()
-					scope := db.NewScope(emptyObj)
-					tableName := scope.TableName()
-					if !truncatedTables[tableName] {
-						err := db.AutoMigrate(emptyObj).Error
-						if err != nil {
-							panic(err)
-						}
-						truncateTablesIfNotYet(db, []string{tableName}, truncatedTables)
-					}
-				}
-
-				err := db.Save(obj).Error
-				if err != nil {
-					panic(err)
-				}
-			}
 		}
 	}
 	return

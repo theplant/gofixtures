@@ -1,0 +1,9 @@
+mysql:
+  image: mariadb:10.5.8
+  environment:
+    - "MYSQL_ROOT_PASSWORD=123"
+    - "MYSQL_USER=gofixtures"
+    - "MYSQL_PASSWORD=123"
+    - "MYSQL_DATABASE=gofixtures_dev"
+  ports:
+    - "3406:3306"

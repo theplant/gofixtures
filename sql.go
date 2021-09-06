@@ -1,9 +1,8 @@
 package gofixtures
 
 import (
+	"database/sql"
 	"strings"
-
-	"github.com/jinzhu/gorm"
 )
 
 type sqlsContext struct {
@@ -11,10 +10,10 @@ type sqlsContext struct {
 	truncateTables []string
 }
 
-func (ic *sqlsContext) truncatePutOnce(db *gorm.DB, truncatedTables map[string]bool) {
+func (ic *sqlsContext) truncatePutOnce(db *sql.DB, truncatedTables map[string]bool) {
 	truncateTablesIfNotYet(db, ic.truncateTables, truncatedTables)
 	for _, sql := range ic.sqls {
-		_, err := db.DB().Exec(sql)
+		_, err := db.Exec(sql)
 		if err != nil {
 			panic(err)
 		}
