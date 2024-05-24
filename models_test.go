@@ -1,16 +1,19 @@
 package gofixtures_test
 
 import (
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"gorm.io/driver/postgres"
+	"gorm.io/gorm"
+	"gorm.io/gorm/logger"
 )
 
-func connectDB() *gorm.DB {
-	db, err := gorm.Open("mysql", "gofixtures:123@tcp(127.0.0.1:3406)/gofixtures_dev?charset=utf8&parseTime=True&loc=Local")
-	db.LogMode(true)
+func connectDB() (db *gorm.DB) {
+	var err error
+	db, err = gorm.Open(postgres.Open("user=gofixtures password=123 dbname=gofixtures_dev sslmode=disable host=localhost port=9432"), &gorm.Config{})
 	if err != nil {
 		panic(err)
 	}
+
+	db.Logger = db.Logger.LogMode(logger.Info)
 	return db
 }
 

@@ -16,8 +16,11 @@ func ExampleSql_2main() {
 -- Data for Name: categories; Type: TABLE DATA; Schema: public; Owner: aigle
 --
 
+INSERT INTO categories (id, created_at, updated_at, deleted_at, code, name, category_id, slug, full_name) VALUES (2, 
+'2016-12-02 04:23:56.812291', '2016-12-07 03:34:32.460387', NULL, 'CL2', 'レディース シューズ', NULL, 'レディース シューズ', 
+'レディース シューズ');
 INSERT INTO categories (id, created_at, updated_at, deleted_at, code, name, category_id, slug, full_name) VALUES (1, '2016-11-25 07:13:36.286416', '2016-12-02 04:23:56.813127', NULL, 'CL1', 'ラバーブーツ', 2, '', 'レディース ラバーブーツ');
-INSERT INTO categories (id, created_at, updated_at, deleted_at, code, name, category_id, slug, full_name) VALUES (2, '2016-12-02 04:23:56.812291', '2016-12-07 03:34:32.460387', NULL, 'CL2', 'レディース シューズ', 0, 'レディース シューズ', 'レディース シューズ');
+
 
 --
 -- Data for Name: genders; Type: TABLE DATA; Schema: public; Owner: aigle
@@ -26,15 +29,7 @@ INSERT INTO categories (id, created_at, updated_at, deleted_at, code, name, cate
 INSERT INTO genders (id, created_at, updated_at, deleted_at, slug, name) VALUES 
 (2, '2016-11-25 07:13:14.382785', '2016-11-25 07:13:14.382785', NULL, 'women', 'レディース'), 
 (1, '2016-11-25 07:13:03.156396', '2016-12-07 03:34:32.457533', NULL, 'men', 'メンズ'),
-(3, '2016-12-02 04:11:18.348472', '2016-12-08 05:39:06.093414', NULL, 'kids', 'キッズ　ベビー');
-
---
--- Data for Name: product_categories; Type: TABLE DATA; Schema: public; Owner: aigle
---
-
-INSERT INTO product_categories (product_id, category_id) VALUES (2, 1);
-INSERT INTO product_categories (product_id, category_id) VALUES (1, 2);
-INSERT INTO product_categories (product_id, category_id) VALUES (3, 2);
+(10, '2016-12-02 04:11:18.348472', '2016-12-08 05:39:06.093414', NULL, 'kids', 'キッズ　ベビー');
 
 
 --
@@ -49,18 +44,34 @@ INSERT INTO products (id, created_at, updated_at, deleted_at, code, gender_id, n
 <p><br></p>', '<p>素材： 表,デクルーズプレインウイーブ（ナイロン100%）裏,リフレクティブプリントマイクロテックスライト（ポリエステル100%）</p>', 'China', 2, '514g　(Mサイズ)');
 INSERT INTO products (id, created_at, updated_at, deleted_at, code, gender_id, name, english_name, season, description, material_description, made_country, icon_flag_id, weight) VALUES (3, '2016-12-07 03:34:32.459302', '2016-12-08 06:42:32.548282', NULL, 'ZBF1508', 1, '【オム】T-KIT MODS', 'T-KIT MODS', '15H', '<p><span style="color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;">T-KITアウターはシーズンレスで着用できることを前提として軽量のGORE-TEXを採用しました。</span></p><p><span style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;">MODSフィッシュテールコート（M-51）をデザインベースとしシルエット見直し、ポケットのデザインと仕様を防水性を高める折り閉じ型（フラップを閉じる事で口が閉じる）しました。</span><br style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;"><span style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;">また、ウエストのスピンドル出口もフラップをつけ同様の効果をねらっています。</span><br style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;"><span style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;">T-KITアウターなのでインナー装着を前提にやや大きめのサイズ感としています。</span><br style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;"><br style="font-size: 14px; color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;"><br></p><p><span style="color: rgb(0, 0, 0); font-family: &quot;ヒラギノ角ゴ Pro W3&quot;, &quot;Hiragino Kaku Gothic Pro&quot;, Osaka, &quot;ＭＳ Ｐゴシック&quot;, &quot;MS PGothic&quot;, verdana, sans-serif;">＊この商品はAIGLEオリジナルのTHERMO KIT対応のアウターです。THERMO KIT対応のインナーをジッパーで組み合わせて1枚のウェアとして着用することができます。</span></p>', '<p><span style="color: rgba(0, 0, 0, 0.870588); font-family: Arial, Helvetica, Verdana, Tahoma, sans-serif;">表地：ナイロン100％</span></p>', 'China', 1, '500g');
 
-        `, []string{"products", "product_categories", "genders", "categories"}),
-	)
+--
+-- Data for Name: product_categories; Type: TABLE DATA; Schema: public; Owner: aigle
+--
 
-	d.TruncatePut(db.DB())
+INSERT INTO product_categories (product_id, category_id) VALUES (2, 1);
+INSERT INTO product_categories (product_id, category_id) VALUES (1, 2);
+INSERT INTO product_categories (product_id, category_id) VALUES (3, 2);
+
+        `, []string{"product_categories", "categories", "products", "genders"}),
+	)
+	dbr, _ := db.DB()
+	d.TruncatePut(dbr)
+	db.Create(&Gender{
+		Slug: "Hello",
+		Name: "Hello",
+	})
+	var g Gender
+	db.Find(&g, "slug = ?", "Hello")
 	var p Product
 	db.Preload("Gender").Preload("Categories").Find(&p, 3)
 	fmt.Println(p.EnglishName)
 	fmt.Println(p.Gender.Name)
 	fmt.Println(len(p.Categories))
+	fmt.Println(g.ID)
 
-	//Output:
-	//T-KIT MODS
-	//メンズ
-	//1
+	// Output:
+	// T-KIT MODS
+	// メンズ
+	// 1
+	// 11
 }
