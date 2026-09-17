@@ -6,7 +6,7 @@ import (
 	"github.com/theplant/gofixtures"
 )
 
-func ExampleSql_2main() {
+func ExampleSql() {
 	db := connectDB()
 	db.AutoMigrate(&Product{}, &Category{}, &Gender{})
 
